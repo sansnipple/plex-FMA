@@ -22,14 +22,16 @@ from PMS.Objects import *
 from PMS.Shortcuts import *
 
 
-LMA_PREFIX   = "/music/FMA"
+FMA_PREFIX   = "/music/FMA"
+
+API_ROOT = "http://freemusicarchive.org/api/get/"
 
 CACHE_INTERVAL = 3600
 
 
 ###################################################################################################
 def Start():
-  Plugin.AddPrefixHandler(LMA_PREFIX, MainMenu, 'Free Music Archive', 'icon-default.png', 'art-default.png')
+  Plugin.AddPrefixHandler(FMA_PREFIX, MainMenu, 'Free Music Archive', 'icon-default.png', 'art-default.png')
   Plugin.AddViewGroup("InfoList", viewMode="InfoList", mediaType="items")
   Plugin.AddViewGroup("List", viewMode="List", mediaType="items")
   MediaContainer.title1 = 'Free Music Archive'
@@ -50,3 +52,26 @@ def MainMenu():
 ##################################################################################################
 
 
+
+def Tracks(search="", query="", sort="", sort_dir="", page="1"):
+  dir = MediaContainer(viewGroup='List')
+	url = API_ROOT + "tracks.xml" + "?" + search + "=" + query + "&limit=50" + "&page=" + page + "&sort_by=" + sort + "&sort_dir=" + sort_dir
+  results = XML.ElementFromURL(url , errors="ignore")
+  for i in range(len(results.xpath("//dataset/value"))):
+    
+    url       = results.xpath("//dataset/value[%i]/track_url/text()" % (i+1))
+    title     = results.xpath("//dataset/value[%i]/track_title/text()" % (i+1))
+    artist    = results.xpath("//dataset/value[%i]/artist_name/text()" % (i+1))
+    album     = results.xpath("//dataset/value[%i]/album_title/text()" % (i+1))
+
+  
+  #gotta do the redirect thing here to grab the actual mp3 url
+    dir.Append(Function(TrackItem(getTrack, title=title, artist=artist, album=album),url)
+  return dir
+
+def getTrack(sender, url=""):
+  
+  page  = XML.ElementFromURL(url, errors="ignroe")
+  track = page.xpath("//a[@title='Download']/@href")
+  
+  return Redirect(track)
