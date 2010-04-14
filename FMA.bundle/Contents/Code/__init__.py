@@ -58,15 +58,21 @@ def Tracks(sender, search="", query="", sort="", sort_dir="", page="1"):
   url = API_ROOT + "tracks.xml" + "?" + search + "=" + query + "&limit=50" + "&page=" + page + "&sort_by=" + sort + "&sort_dir=" + sort_dir
   results = XML.ElementFromURL(url , errors="ignore")
   for i in range(len(results.xpath("//dataset/value"))):
-    track = {}
+    track            = {}
+    track[track_id]  = results.xpath("//dataset/value[%i]/track_id/text()" % (i+1))
     track[url]       = results.xpath("//dataset/value[%i]/track_url/text()" % (i+1))
     track[title]     = results.xpath("//dataset/value[%i]/track_title/text()" % (i+1))
     track[artist]    = results.xpath("//dataset/value[%i]/artist_name/text()" % (i+1))
+    track[artist_id] = results.xpath("//dataset/value[%i]/artist_id/text()" % (i+1))
     track[album]     = results.xpath("//dataset/value[%i]/album_title/text()" % (i+1))
+    track[album_id]  = results.xpath("//dataset/value[%i]/album_id/text()" % (i+1))
     
   
     #gotta do the redirect thing here to grab the actual mp3 url
     dir.Append(Function(TrackItem(getTrack, title=track[title], artist=track[artist], album=track[album], contextKey=track), url=track[url]))
+
+  #insert pagination code here
+  
   return dir
 
 def getTrack(sender, url=""):
