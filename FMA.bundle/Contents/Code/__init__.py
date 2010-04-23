@@ -75,7 +75,7 @@ def Tracks(sender, search_by="", query="", sort_by="", sort_dir="", page="1"):
   total_pages = int(results.xpath("/data/total_pages//text()"))
   if total_pages > 1:
      current_page = int(results.xpath("/data/page//text()"))
-     if page < total_pages:
+     if current_page < total_pages:
        dir.Append(Function(DirectoryItem(Tracks, title="Next Page"), search_by=search_by, query=query, sort_by=sort_by, sort_dir=sort_dir, page=current_page+1))
   
   
