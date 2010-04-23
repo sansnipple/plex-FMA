@@ -71,7 +71,15 @@ def Tracks(sender, search="", query="", sort="", sort_dir="", page="1"):
     #gotta do the redirect thing here to grab the actual mp3 url
     dir.Append(Function(TrackItem(getTrack, title=track[title], artist=track[artist], album=track[album], contextKey=track), url=track[url]))
 
-  #insert pagination code here
+    dir.Append(Function(TrackItem(getTrack, title=track[track_title], artist=track[artist_name], album=track[album_title], contextKey=track), url=track[track_url]))
+
+  #pagination code here
+  total_pages = int(results.xpath("/data/total_pages//text()"))
+  if total_pages > 1:
+     current_page = int(results.xpath("/data/page//text()"))
+     if page < total_pages:
+       dir.Append(Function(DirectoryItem(Tracks, title="Next Page"), search_by=search_by, query=query, sort_by=sort_by, sort_dir=sort_dir, page=current_page+1))
+  
   
   return dir
 
