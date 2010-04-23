@@ -53,24 +53,22 @@ def MainMenu():
 
 
 
-def Tracks(sender, search="", query="", sort="", sort_dir="", page="1"):
+def Tracks(sender, search_by="", query="", sort_by="", sort_dir="", page="1"):
   dir = MediaContainer(viewGroup='List')
-  url = API_ROOT + "tracks.xml" + "?" + search + "=" + query + "&limit=50" + "&page=" + page + "&sort_by=" + sort + "&sort_dir=" + sort_dir
+  url = API_ROOT + "tracks.xml" + "?" + search_by + "=" + query + "&limit=50" + "&page=" + page + "&sort_by=" + sort_by + "&sort_dir=" + sort_dir
   results = XML.ElementFromURL(url , errors="ignore")
   for i in range(len(results.xpath("//dataset/value"))):
-    track            = {}
-    track[track_id]  = results.xpath("//dataset/value[%i]/track_id/text()" % (i+1))
-    track[url]       = results.xpath("//dataset/value[%i]/track_url/text()" % (i+1))
-    track[title]     = results.xpath("//dataset/value[%i]/track_title/text()" % (i+1))
-    track[artist]    = results.xpath("//dataset/value[%i]/artist_name/text()" % (i+1))
-    track[artist_id] = results.xpath("//dataset/value[%i]/artist_id/text()" % (i+1))
-    track[album]     = results.xpath("//dataset/value[%i]/album_title/text()" % (i+1))
-    track[album_id]  = results.xpath("//dataset/value[%i]/album_id/text()" % (i+1))
-    
+    track              = {}
+    track[track_id]    = results.xpath("//dataset/value[%i]/track_id/text()" % (i+1))
+    track[track_url]   = results.xpath("//dataset/value[%i]/track_url/text()" % (i+1))
+    track[track_title] = results.xpath("//dataset/value[%i]/track_title/text()" % (i+1))
+    track[artist_name] = results.xpath("//dataset/value[%i]/artist_name/text()" % (i+1))
+    track[artist_id]   = results.xpath("//dataset/value[%i]/artist_id/text()" % (i+1))
+    track[album_title] = results.xpath("//dataset/value[%i]/album_title/text()" % (i+1))
+    track[album_id]    = results.xpath("//dataset/value[%i]/album_id/text()" % (i+1))
+    # may need to de-listify these xpath results later, i'm not sure how they'll return
   
     #gotta do the redirect thing here to grab the actual mp3 url
-    dir.Append(Function(TrackItem(getTrack, title=track[title], artist=track[artist], album=track[album], contextKey=track), url=track[url]))
-
     dir.Append(Function(TrackItem(getTrack, title=track[track_title], artist=track[artist_name], album=track[album_title], contextKey=track), url=track[track_url]))
 
   #pagination code here
@@ -89,3 +87,11 @@ def getTrack(sender, url=""):
   track = page.xpath("//a[@title='Download']/@href")
   
   return Redirect(realURL)
+
+def Albums(sender, artist_id="", genre_handle="", curator_handle=""):
+  dir = MediaContainer(viewGroup='List')
+  
+  
+  return dir
+
+
