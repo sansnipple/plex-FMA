@@ -55,7 +55,7 @@ def MainMenu():
 
 def Tracks(sender, search_by="", query="", sort_by="", sort_dir="", page="1"):
   dir = MediaContainer(viewGroup='List')
-  url = API_ROOT + "tracks.xml" + "?" + search_by + "=" + query + "&limit=50" + "&page=" + page + "&sort_by=" + sort_by + "&sort_dir=" + sort_dir
+  url = API_ROOT + "tracks.xml?" + search_by + "=" + query + "&limit=50" + "&page=" + page + "&sort_by=" + sort_by + "&sort_dir=" + sort_dir
   results = XML.ElementFromURL(url , errors="ignore")
   for i in range(len(results.xpath("//dataset/value"))):
     track              = {}
@@ -71,12 +71,12 @@ def Tracks(sender, search_by="", query="", sort_by="", sort_dir="", page="1"):
     #gotta do the redirect thing here to grab the actual mp3 url
     dir.Append(Function(TrackItem(getTrack, title=track[track_title], artist=track[artist_name], album=track[album_title], contextKey=track), url=track[track_url]))
 
-  #pagination code here
+  #pagination
   total_pages = int(results.xpath("/data/total_pages//text()"))
   if total_pages > 1:
      current_page = int(results.xpath("/data/page//text()"))
      if current_page < total_pages:
-       dir.Append(Function(DirectoryItem(Tracks, title="Next Page"), search_by=search_by, query=query, sort_by=sort_by, sort_dir=sort_dir, page=current_page+1))
+       dir.Append(Function(DirectoryItem(Tracks, title="Next Page"), search_by=search_by, query=query, sort_by=sort_by, sort_dir=sort_dir, page=str(current_page+1)))
   
   
   return dir
@@ -88,8 +88,28 @@ def getTrack(sender, url=""):
   
   return Redirect(realURL)
 
-def Albums(sender, artist_id="", genre_handle="", curator_handle=""):
+def Albums(sender, artist_id="", genre_handle="", curator_handle="", page = "1",  sort_by="", sort_dir=""):
   dir = MediaContainer(viewGroup='List')
+  url = API_ROOT + "albums.xml?" + "artist_id" + artist_id + "&genre_handle=" + genre_handle + "&curator_handle=" + curator_handle + "&limit=50" + "&page=" + page + "&sort_by=" + sort_by + "&sort_dir=" + sort_dir
+  results = XML.ElementFromURL(url , errors="ignore")
+  for i in range(len(results.xpath("//dataset/value"))):
+    album                     = {}
+    album[album_id]           = results.xpath("//dataset/value[%i]/album_id/text()" % (i+1))
+    album[album_title]        = results.xpath("//dataset/value[%i]/album_title/text()" % (i+1))
+    album[album_type]         = results.xpath("//dataset/value[%i]/album_type/text()" % (i+1))
+    album[artist_name]        = results.xpath("//dataset/value[%i]/artist_name/text()" % (i+1))
+    album[album_information]  = String.StripTags(results.xpath("//dataset/value[%i]/album_information/text()" % (i+1)))
+    # I have no clue how well that StipTags  will work to clean up album_information, that field is quite a mess, may have to remove if its failing loudly
+    
+    dir.Append(Function(DirectoryItem(Tracks, tilte=album[album_title]), search_by="album_id", query=album[album_id]))
+  
+  #pagination
+  total_pages = int(results.xpath("/data/total_pages//text()"))
+  if total_pages > 1:
+     current_page = int(results.xpath("/data/page//text()"))
+     if current_page < total_pages:
+       dir.Append(Function(DirectoryItem(Albums, title="Next Page"), artist_id=artist_id, genre_handle=genre_handle, curator_handle=curator_handle, sort_by=sort_by, sort_dir=sort_dir, page=str(current_page+1)))
+
   
   
   return dir
