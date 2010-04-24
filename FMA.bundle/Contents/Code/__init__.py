@@ -90,7 +90,7 @@ def getTrack(sender, url=""):
 
 def Albums(sender, artist_id="", genre_handle="", curator_handle="", page = "1",  sort_by="", sort_dir=""):
   dir = MediaContainer(viewGroup='List')
-  url = API_ROOT + "albums.xml?" + "artist_id" + artist_id + "&genre_handle=" + genre_handle + "&curator_handle=" + curator_handle + "&limit=50" + "&page=" + page + "&sort_by=" + sort_by + "&sort_dir=" + sort_dir
+  url = API_ROOT + "albums.xml?artist_id=" + artist_id + "&genre_handle=" + genre_handle + "&curator_handle=" + curator_handle + "&limit=50" + "&page=" + page + "&sort_by=" + sort_by + "&sort_dir=" + sort_dir
   results = XML.ElementFromURL(url , errors="ignore")
   for i in range(len(results.xpath("//dataset/value"))):
     album                     = {}
