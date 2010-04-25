@@ -115,3 +115,18 @@ def Albums(sender, artist_id="", genre_handle="", curator_handle="", page = "1",
   return dir
 
 
+def Artists(sender, sort_by="artist_handle", sort_dir=""):
+  dir = MediaContainer(viewGroup='List')
+  
+  
+  # i might need to figure out the @parallelize stuff here to get the full all artists list, theres 96 pages total, too slow to just loop through them all
+  # or i could load them in the background and cache locally for an extended period, maybe best idea
+  # or i could try and see if @progressive_load is stable now
+  # i should also split by letter like i did with LMA
+  
+  
+  return dir
+
+
+
+
