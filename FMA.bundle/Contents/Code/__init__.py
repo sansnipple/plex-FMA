@@ -45,7 +45,8 @@ def Start():
 
 def UpdateCache():
   
-  #ill use this to grab the all artists list and save to the plugin Dict
+  # use this to grab the all artists list and save to the plugin Dict
+  # lets hope i designed this looping right, it'll be a pain to change later
   
   artists = []
   page = 1
@@ -54,7 +55,10 @@ def UpdateCache():
     url = "http://freemusicarchive.org/api/get/artists.xml?limit=50&sort_by=artist_handle&sort_dir=asc&page=" + str(page)
     results = XML.ElementFromURL(url , errors="ignore", cacheTime=CACHE_1DAY)
     for i in range(len(results.xpath("//dataset/value"))):
-      # gather data here
+      artist = {}
+      artist[artist_id] = results.xpath("//dataset/value[%i]/artist_id//text()" % (i+1))
+      
+      
       
       
     total_pages = int(results.xpath("/data/total_pages//text()"))
@@ -83,13 +87,13 @@ def Tracks(sender, search_by="", query="", sort_by="", sort_dir="", page="1"):
   results = XML.ElementFromURL(url , errors="ignore")
   for i in range(len(results.xpath("//dataset/value"))):
     track              = {}
-    track[track_id]    = results.xpath("//dataset/value[%i]/track_id/text()" % (i+1))
-    track[track_url]   = results.xpath("//dataset/value[%i]/track_url/text()" % (i+1))
-    track[track_title] = results.xpath("//dataset/value[%i]/track_title/text()" % (i+1))
-    track[artist_name] = results.xpath("//dataset/value[%i]/artist_name/text()" % (i+1))
-    track[artist_id]   = results.xpath("//dataset/value[%i]/artist_id/text()" % (i+1))
-    track[album_title] = results.xpath("//dataset/value[%i]/album_title/text()" % (i+1))
-    track[album_id]    = results.xpath("//dataset/value[%i]/album_id/text()" % (i+1))
+    track[track_id]    = results.xpath("//dataset/value[%i]/track_id//text()" % (i+1))
+    track[track_url]   = results.xpath("//dataset/value[%i]/track_url//text()" % (i+1))
+    track[track_title] = results.xpath("//dataset/value[%i]/track_title//text()" % (i+1))
+    track[artist_name] = results.xpath("//dataset/value[%i]/artist_name//text()" % (i+1))
+    track[artist_id]   = results.xpath("//dataset/value[%i]/artist_id//text()" % (i+1))
+    track[album_title] = results.xpath("//dataset/value[%i]/album_title//text()" % (i+1))
+    track[album_id]    = results.xpath("//dataset/value[%i]/album_id//text()" % (i+1))
     # may need to de-listify these xpath results later, i'm not sure how they'll return
   
     #gotta do the redirect thing here to grab the actual mp3 url
@@ -118,11 +122,11 @@ def Albums(sender, artist_id="", genre_handle="", curator_handle="", page = "1",
   results = XML.ElementFromURL(url , errors="ignore")
   for i in range(len(results.xpath("//dataset/value"))):
     album                     = {}
-    album[album_id]           = results.xpath("//dataset/value[%i]/album_id/text()" % (i+1))
-    album[album_title]        = results.xpath("//dataset/value[%i]/album_title/text()" % (i+1))
-    album[album_type]         = results.xpath("//dataset/value[%i]/album_type/text()" % (i+1))
-    album[artist_name]        = results.xpath("//dataset/value[%i]/artist_name/text()" % (i+1))
-    album[album_information]  = String.StripTags(results.xpath("//dataset/value[%i]/album_information/text()" % (i+1)))
+    album[album_id]           = results.xpath("//dataset/value[%i]/album_id//text()" % (i+1))
+    album[album_title]        = results.xpath("//dataset/value[%i]/album_title//text()" % (i+1))
+    album[album_type]         = results.xpath("//dataset/value[%i]/album_type//text()" % (i+1))
+    album[artist_name]        = results.xpath("//dataset/value[%i]/artist_name//text()" % (i+1))
+    album[album_information]  = String.StripTags(results.xpath("//dataset/value[%i]/album_information//text()" % (i+1)))
     # I have no clue how well that StipTags  will work to clean up album_information, that field is quite a mess, may have to remove if its failing loudly
     
     dir.Append(Function(DirectoryItem(Tracks, tilte=album[album_title]), search_by="album_id", query=album[album_id]))
