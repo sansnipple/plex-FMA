@@ -43,6 +43,10 @@ def Start():
 
 ###################################################################################################
 
+def CreateDict():
+  Dict.Set("artists", [])
+
+
 def UpdateCache():
   
   # use this to grab the all artists list and save to the plugin Dict
@@ -57,9 +61,12 @@ def UpdateCache():
     for i in range(len(results.xpath("//dataset/value"))):
       artist = {}
       artist[artist_id] = results.xpath("//dataset/value[%i]/artist_id//text()" % (i+1))
+      artist[artist_handle] = results.xpath("//dataset/value[%i]/artist_handle//text()" % (i+1))
+      artist[artist_name] = results.xpath("//dataset/value[%i]/artist_name//text()" % (i+1))
+      artist[artist_bio] = String.StripTags(results.xpath("//dataset/value[%i]/artist_bio//text()" % (i+1))) # here too i'll have to test to see how well String.StripTags works
+      # images here later hopefully
       
-      
-      
+      artists.append(artist)
       
     total_pages = int(results.xpath("/data/total_pages//text()"))
     current_page = int(results.xpath("/data/page//text()"))
@@ -69,6 +76,7 @@ def UpdateCache():
     else:
       break
 
+  Dict.Set("artists", artists)
 
 #####################
 
