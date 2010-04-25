@@ -43,6 +43,30 @@ def Start():
 
 ###################################################################################################
 
+def UpdateCache():
+  
+  #ill use this to grab the all artists list and save to the plugin Dict
+  
+  artists = []
+  page = 1
+  total_pages = 1
+  while page <= total_pages:
+    url = "http://freemusicarchive.org/api/get/artists.xml?limit=50&sort_by=artist_handle&sort_dir=asc&page=" + str(page)
+    results = XML.ElementFromURL(url , errors="ignore", cacheTime=CACHE_1DAY)
+    for i in range(len(results.xpath("//dataset/value"))):
+      # gather data here
+      
+      
+    total_pages = int(results.xpath("/data/total_pages//text()"))
+    current_page = int(results.xpath("/data/page//text()"))
+    page = current_page + 1
+    if current_page < total_pages:
+      continue
+    else:
+      break
+
+
+#####################
 
 def MainMenu():
 	dir = MediaContainer(viewGroup='List')
