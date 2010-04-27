@@ -56,7 +56,7 @@ def UpdateCache():
   page = 1
   total_pages = 1
   while page <= total_pages:
-    url = "http://freemusicarchive.org/api/get/artists.xml?limit=50&sort_by=artist_handle&sort_dir=asc&page=" + str(page)
+    url = API_ROOT + "artists.xml?limit=50&sort_by=artist_handle&sort_dir=asc&page=" + str(page)
     results = XML.ElementFromURL(url , errors="ignore", cacheTime=CACHE_1DAY)
     for i in range(len(results.xpath("//dataset/value"))):
       artist = {}
