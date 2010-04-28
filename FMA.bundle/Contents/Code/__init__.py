@@ -82,10 +82,17 @@ def UpdateCache():
 
 def MainMenu():
 	dir = MediaContainer(viewGroup='List')
-
-	return dir	
+	dir.Append(Function(DirectoryItem(Artists, title="All Artists...")))
+  dir.Append(Function(DirectoryItem(ResetDict, title="do not pass go"))) # for debuging so dont have to manually nuke the dict every time
+	return dir
 
 ##################################################################################################
+
+# for debuging only 
+def ResetDict(sender):
+  dir = Mediacontainer(viewGroup='List')
+  Dict.Reset()
+  return MessageContainer("blammo", "Dict Reset")
 
 
 
@@ -154,12 +161,13 @@ def Albums(sender, artist_id="", genre_handle="", curator_handle="", page = "1",
 def Artists(sender, sort_by="artist_handle", sort_dir=""):
   dir = MediaContainer(viewGroup='List')
   
-  
-  # i might need to figure out the @parallelize stuff here to get the full all artists list, theres 96 pages total, too slow to just loop through them all
-  # or i could load them in the background and cache locally for an extended period, maybe best idea
-  # or i could try and see if @progressive_load is stable now
+
   # i should also split by letter like i did with LMA
-  
+  artists = Dict.Get("artists")
+  if artists == []:
+    return MessageContainer("oh god the blood!", "sorry an error has occured \nlikely the artists list just isnt populated yet \nwait a bit and try again")
+  for artist in artists:
+    dir.Append(Function(DirectoryItem(Albums, title=artist[artist_id], summary=artist[artist_bio]), artist_id=artist[artist_id]))
   
   return dir
 
