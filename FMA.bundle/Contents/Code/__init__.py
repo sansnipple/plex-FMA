@@ -60,16 +60,16 @@ def UpdateCache():
     results = XML.ElementFromURL(url , errors="ignore", cacheTime=CACHE_1DAY)
     for i in range(len(results.xpath("//dataset/value"))):
       artist = {}
-      artist["artist_id"] = results.xpath("//dataset/value[%i]/artist_id//text()" % (i+1))
-      artist["artist_handle"] = results.xpath("//dataset/value[%i]/artist_handle//text()" % (i+1))
-      artist["artist_name"] = results.xpath("//dataset/value[%i]/artist_name//text()" % (i+1))
+      artist["artist_id"] = results.xpath("//dataset/value[%i]/artist_id//text()" % (i+1))[0]
+      artist["artist_handle"] = results.xpath("//dataset/value[%i]/artist_handle//text()" % (i+1))[0]
+      artist["artist_name"] = results.xpath("//dataset/value[%i]/artist_name//text()" % (i+1))[0]
 #      artist["artist_bio"] = String.StripTags(results.xpath("//dataset/value[%i]/artist_bio//text()" % (i+1))) # here too i'll have to test to see how well String.StripTags works
       # images here later hopefully
       if page == 1 : Log(artist)
       artists.append(artist)
       
-    total_pages = int(results.xpath("/data/total_pages//text()"))
-    current_page = int(results.xpath("/data/page//text()"))
+    total_pages = int(results.xpath("/data/total_pages//text()")[0])
+    current_page = int(results.xpath("/data/page//text()")[0])
     page = current_page + 1
     if current_page < total_pages:
       continue
@@ -103,22 +103,22 @@ def Tracks(sender, search_by="", query="", sort_by="", sort_dir="", page="1"):
   results = XML.ElementFromURL(url , errors="ignore")
   for i in range(len(results.xpath("//dataset/value"))):
     track                = {}
-    track["track_id"]    = results.xpath("//dataset/value[%i]/track_id//text()" % (i+1))
-    track["track_url"]   = results.xpath("//dataset/value[%i]/track_url//text()" % (i+1))
-    track["track_title"] = results.xpath("//dataset/value[%i]/track_title//text()" % (i+1))
-    track["artist_name"] = results.xpath("//dataset/value[%i]/artist_name//text()" % (i+1))
-    track["artist_id"]   = results.xpath("//dataset/value[%i]/artist_id//text()" % (i+1))
-    track["album_title"] = results.xpath("//dataset/value[%i]/album_title//text()" % (i+1))
-    track["album_id"]    = results.xpath("//dataset/value[%i]/album_id//text()" % (i+1))
-    # may need to de-listify these xpath results later, i'm not sure how they'll return
+    track["track_id"]    = results.xpath("//dataset/value[%i]/track_id//text()" % (i+1))[0]
+    track["track_url"]   = results.xpath("//dataset/value[%i]/track_url//text()" % (i+1))[0]
+    track["track_title"] = results.xpath("//dataset/value[%i]/track_title//text()" % (i+1))[0]
+    track["artist_name"] = results.xpath("//dataset/value[%i]/artist_name//text()" % (i+1))[0]
+    track["artist_id"]   = results.xpath("//dataset/value[%i]/artist_id//text()" % (i+1))[0]
+    track["album_title"] = results.xpath("//dataset/value[%i]/album_title//text()" % (i+1))[0]
+    track["album_id"]    = results.xpath("//dataset/value[%i]/album_id//text()" % (i+1))[0]
+    # please please no indez errors
   
     #gotta do the redirect thing here to grab the actual mp3 url
     dir.Append(Function(TrackItem(getTrack, title=track["track_title"], artist=track["artist_name"], album=track["album_title"], contextKey=track), url=track["track_url"]))
 
   #pagination
-  total_pages = int(results.xpath("/data/total_pages//text()"))
+  total_pages = int(results.xpath("/data/total_pages//text()")[0])
   if total_pages > 1:
-     current_page = int(results.xpath("/data/page//text()"))
+     current_page = int(results.xpath("/data/page//text()")[0])
      if current_page < total_pages:
        dir.Append(Function(DirectoryItem(Tracks, title="Next Page"), search_by=search_by, query=query, sort_by=sort_by, sort_dir=sort_dir, page=str(current_page+1)))
   
@@ -129,6 +129,7 @@ def getTrack(sender, url=""):
   
   page  = XML.ElementFromURL(url, errors="ignroe")
   track = page.xpath("//a[@title='Download']/@href")
+  Log(track)
   
   return Redirect(realURL)
 
@@ -138,19 +139,19 @@ def Albums(sender, artist_id="", genre_handle="", curator_handle="", page = "1",
   results = XML.ElementFromURL(url , errors="ignore")
   for i in range(len(results.xpath("//dataset/value"))):
     album                       = {}
-    album["album_id"]           = results.xpath("//dataset/value[%i]/album_id//text()" % (i+1))
-    album["album_title"]        = results.xpath("//dataset/value[%i]/album_title//text()" % (i+1))
-    album["album_type"]         = results.xpath("//dataset/value[%i]/album_type//text()" % (i+1))
-    album["artist_name"]        = results.xpath("//dataset/value[%i]/artist_name//text()" % (i+1))
+    album["album_id"]           = results.xpath("//dataset/value[%i]/album_id//text()" % (i+1))[0]
+    album["album_title"]        = results.xpath("//dataset/value[%i]/album_title//text()" % (i+1))[0]
+    album["album_type"]         = results.xpath("//dataset/value[%i]/album_type//text()" % (i+1))[0]
+    album["artist_name"]        = results.xpath("//dataset/value[%i]/artist_name//text()" % (i+1))[0]
     album["album_information"]  = String.StripTags(results.xpath("//dataset/value[%i]/album_information//text()" % (i+1)))
     # I have no clue how well that StipTags  will work to clean up album_information, that field is quite a mess, may have to remove if its failing loudly
     
     dir.Append(Function(DirectoryItem(Tracks, tilte=album["album_title"]), search_by="album_id", query=album["album_id"]))
   
   #pagination
-  total_pages = int(results.xpath("/data/total_pages//text()"))
+  total_pages = int(results.xpath("/data/total_pages//text()")[0])
   if total_pages > 1:
-     current_page = int(results.xpath("/data/page//text()"))
+     current_page = int(results.xpath("/data/page//text()")[0])
      if current_page < total_pages:
        dir.Append(Function(DirectoryItem(Albums, title="Next Page"), artist_id=artist_id, genre_handle=genre_handle, curator_handle=curator_handle, sort_by=sort_by, sort_dir=sort_dir, page=str(current_page+1)))
 
