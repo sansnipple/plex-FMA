@@ -60,12 +60,12 @@ def UpdateCache():
     results = XML.ElementFromURL(url , errors="ignore", cacheTime=CACHE_1DAY)
     for i in range(len(results.xpath("//dataset/value"))):
       artist = {}
-      artist[artist_id] = results.xpath("//dataset/value[%i]/artist_id//text()" % (i+1))
-      artist[artist_handle] = results.xpath("//dataset/value[%i]/artist_handle//text()" % (i+1))
-      artist[artist_name] = results.xpath("//dataset/value[%i]/artist_name//text()" % (i+1))
-      artist[artist_bio] = String.StripTags(results.xpath("//dataset/value[%i]/artist_bio//text()" % (i+1))) # here too i'll have to test to see how well String.StripTags works
+      artist["artist_id"] = results.xpath("//dataset/value[%i]/artist_id//text()" % (i+1))
+      artist["artist_handle"] = results.xpath("//dataset/value[%i]/artist_handle//text()" % (i+1))
+      artist["artist_name"] = results.xpath("//dataset/value[%i]/artist_name//text()" % (i+1))
+#      artist["artist_bio"] = String.StripTags(results.xpath("//dataset/value[%i]/artist_bio//text()" % (i+1))) # here too i'll have to test to see how well String.StripTags works
       # images here later hopefully
-      
+      if page == 1 : Log(artist)
       artists.append(artist)
       
     total_pages = int(results.xpath("/data/total_pages//text()"))
@@ -83,15 +83,16 @@ def UpdateCache():
 def MainMenu():
   dir = MediaContainer(viewGroup='List')
   dir.Append(Function(DirectoryItem(Artists, title="All Artists...")))
-  dir.Append(Function(DirectoryItem(ResetDict, title="do not pass go"))) # for debuging so dont have to manually nuke the dict every time
+  dir.Append(Function(DirectoryItem(ResetDict, title="do not pass go"))) # for debugging so dont have to manually nuke the dict every time
   return dir
 
 ##################################################################################################
 
-# for debuging only 
+# for debugging only 
 def ResetDict(sender):
-  dir = Mediacontainer(viewGroup='List')
+  dir = MediaContainer(viewGroup='List')
   Dict.Reset()
+  UpdateCache()
   return MessageContainer("blammo", "Dict Reset")
 
 
@@ -101,18 +102,18 @@ def Tracks(sender, search_by="", query="", sort_by="", sort_dir="", page="1"):
   url = API_ROOT + "tracks.xml?" + search_by + "=" + query + "&limit=50" + "&page=" + page + "&sort_by=" + sort_by + "&sort_dir=" + sort_dir
   results = XML.ElementFromURL(url , errors="ignore")
   for i in range(len(results.xpath("//dataset/value"))):
-    track              = {}
-    track[track_id]    = results.xpath("//dataset/value[%i]/track_id//text()" % (i+1))
-    track[track_url]   = results.xpath("//dataset/value[%i]/track_url//text()" % (i+1))
-    track[track_title] = results.xpath("//dataset/value[%i]/track_title//text()" % (i+1))
-    track[artist_name] = results.xpath("//dataset/value[%i]/artist_name//text()" % (i+1))
-    track[artist_id]   = results.xpath("//dataset/value[%i]/artist_id//text()" % (i+1))
-    track[album_title] = results.xpath("//dataset/value[%i]/album_title//text()" % (i+1))
-    track[album_id]    = results.xpath("//dataset/value[%i]/album_id//text()" % (i+1))
+    track                = {}
+    track["track_id"]    = results.xpath("//dataset/value[%i]/track_id//text()" % (i+1))
+    track["track_url"]   = results.xpath("//dataset/value[%i]/track_url//text()" % (i+1))
+    track["track_title"] = results.xpath("//dataset/value[%i]/track_title//text()" % (i+1))
+    track["artist_name"] = results.xpath("//dataset/value[%i]/artist_name//text()" % (i+1))
+    track["artist_id"]   = results.xpath("//dataset/value[%i]/artist_id//text()" % (i+1))
+    track["album_title"] = results.xpath("//dataset/value[%i]/album_title//text()" % (i+1))
+    track["album_id"]    = results.xpath("//dataset/value[%i]/album_id//text()" % (i+1))
     # may need to de-listify these xpath results later, i'm not sure how they'll return
   
     #gotta do the redirect thing here to grab the actual mp3 url
-    dir.Append(Function(TrackItem(getTrack, title=track[track_title], artist=track[artist_name], album=track[album_title], contextKey=track), url=track[track_url]))
+    dir.Append(Function(TrackItem(getTrack, title=track["track_title"], artist=track["artist_name"], album=track["album_title"], contextKey=track), url=track["track_url"]))
 
   #pagination
   total_pages = int(results.xpath("/data/total_pages//text()"))
@@ -136,15 +137,15 @@ def Albums(sender, artist_id="", genre_handle="", curator_handle="", page = "1",
   url = API_ROOT + "albums.xml?artist_id=" + artist_id + "&genre_handle=" + genre_handle + "&curator_handle=" + curator_handle + "&limit=50" + "&page=" + page + "&sort_by=" + sort_by + "&sort_dir=" + sort_dir
   results = XML.ElementFromURL(url , errors="ignore")
   for i in range(len(results.xpath("//dataset/value"))):
-    album                     = {}
-    album[album_id]           = results.xpath("//dataset/value[%i]/album_id//text()" % (i+1))
-    album[album_title]        = results.xpath("//dataset/value[%i]/album_title//text()" % (i+1))
-    album[album_type]         = results.xpath("//dataset/value[%i]/album_type//text()" % (i+1))
-    album[artist_name]        = results.xpath("//dataset/value[%i]/artist_name//text()" % (i+1))
-    album[album_information]  = String.StripTags(results.xpath("//dataset/value[%i]/album_information//text()" % (i+1)))
+    album                       = {}
+    album["album_id"]           = results.xpath("//dataset/value[%i]/album_id//text()" % (i+1))
+    album["album_title"]        = results.xpath("//dataset/value[%i]/album_title//text()" % (i+1))
+    album["album_type"]         = results.xpath("//dataset/value[%i]/album_type//text()" % (i+1))
+    album["artist_name"]        = results.xpath("//dataset/value[%i]/artist_name//text()" % (i+1))
+    album["album_information"]  = String.StripTags(results.xpath("//dataset/value[%i]/album_information//text()" % (i+1)))
     # I have no clue how well that StipTags  will work to clean up album_information, that field is quite a mess, may have to remove if its failing loudly
     
-    dir.Append(Function(DirectoryItem(Tracks, tilte=album[album_title]), search_by="album_id", query=album[album_id]))
+    dir.Append(Function(DirectoryItem(Tracks, tilte=album["album_title"]), search_by="album_id", query=album["album_id"]))
   
   #pagination
   total_pages = int(results.xpath("/data/total_pages//text()"))
@@ -167,7 +168,7 @@ def Artists(sender, sort_by="artist_handle", sort_dir=""):
   if artists == []:
     return MessageContainer("oh god the blood!", "sorry an error has occured \nlikely the artists list just isnt populated yet \nwait a bit and try again")
   for artist in artists:
-    dir.Append(Function(DirectoryItem(Albums, title=artist[artist_id], summary=artist[artist_bio]), artist_id=artist[artist_id]))
+    dir.Append(Function(DirectoryItem(Albums, title=artist["artist_id"]), artist_id=artist["artist_id"]))
   
   return dir
 
