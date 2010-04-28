@@ -115,7 +115,7 @@ def Tracks(sender, search_by="", query="", sort_by="", sort_dir="", page="1"):
   
     #gotta do the redirect thing here to grab the actual mp3 url
     dir.Append(Function(TrackItem(getTrack, title=track["track_title"], artist=track["artist_name"], album=track["album_title"], contextKey=track), url=track["track_url"]))
-
+    Log(track)
   #pagination
   total_pages = int(results.xpath("/data/total_pages//text()")[0])
   if total_pages > 1:
@@ -129,10 +129,10 @@ def Tracks(sender, search_by="", query="", sort_by="", sort_dir="", page="1"):
 def getTrack(sender, url=""):
   
   page  = XML.ElementFromURL(url, errors="ignroe")
-  track = page.xpath("//a[@title='Download']/@href")
+  track = page.xpath("//a[@title='Download']/@href")[0]
   Log(track)
   
-  return Redirect(realURL)
+  return Redirect(track)
 
 def Albums(sender, artist_id="", genre_handle="", curator_handle="", page = "1",  sort_by="", sort_dir=""):
   dir = MediaContainer(viewGroup='List')
@@ -147,7 +147,7 @@ def Albums(sender, artist_id="", genre_handle="", curator_handle="", page = "1",
 #    album["album_information"]  = results.xpath("//dataset/value[%i]/album_information//text()" % (i+1))[0]
     # I have no clue how well that StipTags  will work to clean up album_information, that field is quite a mess, may have to remove if its failing loudly
     
-    dir.Append(Function(DirectoryItem(Tracks, tilte=album["album_title"]), search_by="album_id", query=album["album_id"]))
+    dir.Append(Function(DirectoryItem(Tracks, title=album["album_title"]), search_by="album_id", query=album["album_id"]))
   
   #pagination
   total_pages = int(results.xpath("/data/total_pages//text()")[0])
