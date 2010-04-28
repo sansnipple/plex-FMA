@@ -59,11 +59,11 @@ def UpdateCache():
     url = API_ROOT + "artists.xml?limit=50&sort_by=artist_handle&sort_dir=asc&page=" + str(page)
     results = XML.ElementFromURL(url , errors="ignore", cacheTime=CACHE_1DAY)
     for i in range(len(results.xpath("//dataset/value"))):
-      artist = {}
-      artist["artist_id"] = results.xpath("//dataset/value[%i]/artist_id//text()" % (i+1))[0]
+      artist                  = {}
+      artist["artist_id"]     = results.xpath("//dataset/value[%i]/artist_id//text()" % (i+1))[0]
       artist["artist_handle"] = results.xpath("//dataset/value[%i]/artist_handle//text()" % (i+1))[0]
-      artist["artist_name"] = results.xpath("//dataset/value[%i]/artist_name//text()" % (i+1))[0]
-#      artist["artist_bio"] = String.StripTags(results.xpath("//dataset/value[%i]/artist_bio//text()" % (i+1))) # here too i'll have to test to see how well String.StripTags works
+      artist["artist_name"]   = results.xpath("//dataset/value[%i]/artist_name//text()" % (i+1))[0]
+      artist["artist_bio"]    = results.xpath("//dataset/value[%i]/artist_bio//text()" % (i+1))[0]
       # images here later hopefully
       if page == 1 : Log(artist)
       artists.append(artist)
@@ -143,7 +143,7 @@ def Albums(sender, artist_id="", genre_handle="", curator_handle="", page = "1",
     album["album_title"]        = results.xpath("//dataset/value[%i]/album_title//text()" % (i+1))[0]
     album["album_type"]         = results.xpath("//dataset/value[%i]/album_type//text()" % (i+1))[0]
     album["artist_name"]        = results.xpath("//dataset/value[%i]/artist_name//text()" % (i+1))[0]
-    album["album_information"]  = String.StripTags(results.xpath("//dataset/value[%i]/album_information//text()" % (i+1)))
+    album["album_information"]  = results.xpath("//dataset/value[%i]/album_information//text()" % (i+1))[0]
     # I have no clue how well that StipTags  will work to clean up album_information, that field is quite a mess, may have to remove if its failing loudly
     
     dir.Append(Function(DirectoryItem(Tracks, tilte=album["album_title"]), search_by="album_id", query=album["album_id"]))
@@ -169,7 +169,7 @@ def Artists(sender, sort_by="artist_handle", sort_dir=""):
   if artists == []:
     return MessageContainer("oh god the blood!", "sorry an error has occured \nlikely the artists list just isnt populated yet \nwait a bit and try again")
   for artist in artists:
-    dir.Append(Function(DirectoryItem(Albums, title=artist["artist_id"]), artist_id=artist["artist_id"]))
+    dir.Append(Function(DirectoryItem(Albums, title=artist["artist_name"]), artist_id=artist["artist_id"]))
   
   return dir
 
