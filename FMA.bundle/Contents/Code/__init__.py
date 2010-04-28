@@ -81,10 +81,10 @@ def UpdateCache():
 #####################
 
 def MainMenu():
-	dir = MediaContainer(viewGroup='List')
-	dir.Append(Function(DirectoryItem(Artists, title="All Artists...")))
+  dir = MediaContainer(viewGroup='List')
+  dir.Append(Function(DirectoryItem(Artists, title="All Artists...")))
   dir.Append(Function(DirectoryItem(ResetDict, title="do not pass go"))) # for debuging so dont have to manually nuke the dict every time
-	return dir
+  return dir
 
 ##################################################################################################
 
