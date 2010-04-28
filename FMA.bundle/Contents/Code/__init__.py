@@ -112,10 +112,10 @@ def Tracks(sender, search_by="", query="", sort_by="", sort_dir="", page="1"):
     track["album_title"] = results.xpath("//dataset/value[%i]/album_title//text()" % (i+1))[0]
     track["album_id"]    = results.xpath("//dataset/value[%i]/album_id//text()" % (i+1))[0]
     # please please no indez errors
-  
+    
     #gotta do the redirect thing here to grab the actual mp3 url
-    dir.Append(Function(TrackItem(getTrack, title=track["track_title"], artist=track["artist_name"], album=track["album_title"], contextKey=track), url=track["track_url"]))
-    Log(track)
+    dir.Append(Function(TrackItem(getTrack, title=track["track_title"], artist=track["artist_name"], album=track["album_title"], contextKey=track), ext="mp3", url=track["track_url"]))
+    
   #pagination
   total_pages = int(results.xpath("/data/total_pages//text()")[0])
   if total_pages > 1:
@@ -126,13 +126,12 @@ def Tracks(sender, search_by="", query="", sort_by="", sort_dir="", page="1"):
   
   return dir
 
-def getTrack(sender, url=""):
+def getTrack(sender, url=''):
   
-  page  = XML.ElementFromURL(url, errors="ignroe")
-  track = page.xpath("//a[@title='Download']/@href")[0]
-  Log(track)
+  page  = XML.ElementFromURL(url, isHTML=True)
+  finalURL = page.xpath("//a[@title='Download']/@href")[0]
   
-  return Redirect(track)
+  return Redirect(finalURL)
 
 def Albums(sender, artist_id="", genre_handle="", curator_handle="", page = "1",  sort_by="", sort_dir=""):
   dir = MediaContainer(viewGroup='List')
