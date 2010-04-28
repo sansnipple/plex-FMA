@@ -63,9 +63,10 @@ def UpdateCache():
       artist["artist_id"]     = results.xpath("//dataset/value[%i]/artist_id//text()" % (i+1))[0]
       artist["artist_handle"] = results.xpath("//dataset/value[%i]/artist_handle//text()" % (i+1))[0]
       artist["artist_name"]   = results.xpath("//dataset/value[%i]/artist_name//text()" % (i+1))[0]
-      artist["artist_bio"]    = results.xpath("//dataset/value[%i]/artist_bio//text()" % (i+1))[0]
+      try:
+        artist["artist_bio"]    = results.xpath("//dataset/value[%i]/artist_bio//text()" % (i+1))[0]
+      except: artist["artist_bio"] = "No Information Availible"
       # images here later hopefully
-      if page == 1 : Log(artist)
       artists.append(artist)
       
     total_pages = int(results.xpath("/data/total_pages//text()")[0])
@@ -141,9 +142,9 @@ def Albums(sender, artist_id="", genre_handle="", curator_handle="", page = "1",
     album                       = {}
     album["album_id"]           = results.xpath("//dataset/value[%i]/album_id//text()" % (i+1))[0]
     album["album_title"]        = results.xpath("//dataset/value[%i]/album_title//text()" % (i+1))[0]
-    album["album_type"]         = results.xpath("//dataset/value[%i]/album_type//text()" % (i+1))[0]
+#    album["album_type"]         = results.xpath("//dataset/value[%i]/album_type//text()" % (i+1))[0]
     album["artist_name"]        = results.xpath("//dataset/value[%i]/artist_name//text()" % (i+1))[0]
-    album["album_information"]  = results.xpath("//dataset/value[%i]/album_information//text()" % (i+1))[0]
+#    album["album_information"]  = results.xpath("//dataset/value[%i]/album_information//text()" % (i+1))[0]
     # I have no clue how well that StipTags  will work to clean up album_information, that field is quite a mess, may have to remove if its failing loudly
     
     dir.Append(Function(DirectoryItem(Tracks, tilte=album["album_title"]), search_by="album_id", query=album["album_id"]))
