@@ -31,7 +31,7 @@ CACHE_INTERVAL = 3600
 
 ###################################################################################################
 def Start():
-  Plugin.AddPrefixHandler(FMA_PREFIX, MainMenu, 'Free Music Archive', 'icon-default.png', 'art-default.png')
+  Plugin.AddPrefixHandler(FMA_PREFIX, MainMenu, 'The Free Music Archive', 'icon-default.png', 'art-default.png')
   Plugin.AddViewGroup("InfoList", viewMode="InfoList", mediaType="items")
   Plugin.AddViewGroup("List", viewMode="List", mediaType="items")
   MediaContainer.title1 = 'Free Music Archive'
