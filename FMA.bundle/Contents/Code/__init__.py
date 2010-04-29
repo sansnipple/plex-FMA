@@ -84,6 +84,8 @@ def UpdateCache():
 def MainMenu():
   dir = MediaContainer(viewGroup='List')
   dir.Append(Function(DirectoryItem(Artists, title="All Artists...")))
+  dir.Append(Function(DirectoryItem(RSS, title="Most Interesting Highlights"), url = "http://freemusicarchive.org/interesting.atom"))
+  dir.Append(Function(DirectoryItem(RSS, title="Recently Added Hightlights"), url = "http://freemusicarchive.org/recent.atom"))
   dir.Append(Function(DirectoryItem(ResetDict, title="do not pass go"))) # for debugging so dont have to manually nuke the dict every time
   return dir
 
@@ -173,6 +175,19 @@ def Artists(sender, sort_by="artist_handle", sort_dir=""):
   
   return dir
 
-
+def RSS(sender, url=''):
+  dir = MediaContainer(viewGroup='List', title2=sender.itemTitle)
+  # wish these feeds contained id numbers i could link them with the api for fuller metadata, but i can work with what i've got
+  feed = XML.ElementFromURL(url, isHTML=True, errors='ignore')
+  for i in range(len(feed.xpath("//entry"))):
+    title = feed.xpath("//entry[%i]/title//text()" % (i+1))[0]
+    title = title.split(" : ", )
+    artist_name = title[0]
+    album_title = title[1]
+    track_title = title[2]
+    track_url = feed.xpath("//entry[%i]/link[@rel='alternate']/@href" % (i+1))[0]
+    # maybe later try to parse a artist handle out of this somewhere to get a usable context key
+    dir.Append(Function(TrackItem(getTrack, title=track_title, artist=artist_name, album=album_title), ext="mp3", url=track_url))
+  return dir
 
 
