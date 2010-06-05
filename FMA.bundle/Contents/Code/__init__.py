@@ -111,9 +111,9 @@ def Tracks(sender, search_by="", query="", sort_by="", sort_dir="", page="1"):
     dir.Append(Function(TrackItem(getTrack, title=track.track_title, artist=track.artist_name, album=track.album_title), ext="mp3", url=track.track_url.pyval))
     
   # pagination
-  if data.total_pages >= 1:
+  if data.total_pages > 1:
     if data.page < data.total_pages:
-      dir.Append(Function(DirectoryItem(Tracks, title="Next Page"), search_by=search_by, query=query, sort_by=sort_by, sort_dir=sort_dir, page=str(data.total_pages.pyval)))
+      dir.Append(Function(DirectoryItem(Tracks, title="Next Page"), search_by=search_by, query=query, sort_by=sort_by, sort_dir=sort_dir, page=str(data.total_pages.pyval + 1)))
 
   return dir
 
